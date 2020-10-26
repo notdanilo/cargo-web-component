@@ -1,8 +1,12 @@
 [package]
-name = "cargo-web-component"
-version = "0.1.0"
-authors = ["Danilo Guanabara <danguafer@gmail.com>"]
-edition = "2018"
+name          = "cargo-web-component"
+version       = "0.1.0"
+authors       = ["Danilo Guanabara <danguafer@gmail.com>"]
+edition       = "2018"
+license       = "Apache-2.0"
+description   = "Cargo commands for ease web-component-rs development."
+readme        = "README.md"
+repository    = "https://github.com/notdanilo/cargo-web-component"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
