@@ -33,19 +33,8 @@ impl Command {
     }
 }
 
-use actix_files::NamedFile;
-use actix_web::{HttpRequest, Result};
-use std::path::PathBuf;
-
-async fn index(req: HttpRequest) -> Result<NamedFile> {
-    let mut path: PathBuf = req.match_info().query("filename").parse().unwrap();
-    if path.display().to_string() == "" {
-        path = "index.html".parse().unwrap();
-    }
-    Ok(NamedFile::open(path)?)
-}
-
-use actix_web::{web, App, HttpServer};
+use actix_files as fs;
+use actix_web::{App, HttpServer};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -70,8 +59,6 @@ async fn main() -> std::io::Result<()> {
 
             let package_name = toml["package"]["name"].as_str().expect("Couldn't get package name.");
 
-            //assert_eq!(value["foo"].as_str(), Some("bar"));
-
             let index_content = include_str!("../dependencies/index.html");
             let index_content = index_content.replace("PACKAGE-NAME", package_name);
 
@@ -86,7 +73,15 @@ async fn main() -> std::io::Result<()> {
             write_to(include_bytes!("../dependencies/web-component/web-component-wasm-loader.js")      , &format!("./{}/web-component/web-component-wasm-loader.js", out_dir));
         },
         Command::Serve(port) => {
-            HttpServer::new(|| App::new().route("/{filename:.*}", web::get().to(index)))
+            println!("Serving at localhost:{}", port);
+            HttpServer::new(move || {
+                App::new().service(
+                    fs::Files::new("/", out_dir)
+                        .show_files_listing()
+                        .use_last_modified(true)
+                        .index_file("index.html"),
+                )
+            })
                 .bind(format!("127.0.0.1:{}", port))?
                 .run()
                 .await?;
