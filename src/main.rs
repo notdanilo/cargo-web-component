@@ -33,7 +33,22 @@ impl Command {
     }
 }
 
-fn main() {
+use actix_files::NamedFile;
+use actix_web::{HttpRequest, Result};
+use std::path::PathBuf;
+
+async fn index(req: HttpRequest) -> Result<NamedFile> {
+    let mut path: PathBuf = req.match_info().query("filename").parse().unwrap();
+    if path.display().to_string() == "" {
+        path = "index.html".parse().unwrap();
+    }
+    Ok(NamedFile::open(path)?)
+}
+
+use actix_web::{web, App, HttpServer};
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     let out_dir = "pkg";
     create_dir_all(format!("./{}/web-component", out_dir)).expect("Couldn't create all directories.");
 
@@ -71,15 +86,13 @@ fn main() {
             write_to(include_bytes!("../dependencies/web-component/web-component-wasm-loader.js")      , &format!("./{}/web-component/web-component-wasm-loader.js", out_dir));
         },
         Command::Serve(port) => {
-            process::Command::new("python")
-                .arg("-m")
-                .arg("http.server")
-                .arg(format!("{}", port))
-                .arg("--directory")
-                .arg(out_dir)
-                .status()
-                .expect("Failed");
+            HttpServer::new(|| App::new().route("/{filename:.*}", web::get().to(index)))
+                .bind(format!("127.0.0.1:{}", port))?
+                .run()
+                .await?;
         },
         _ => ()
     }
+
+    Ok(())
 }

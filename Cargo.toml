@@ -1,6 +1,6 @@
 [package]
 name          = "cargo-web-component"
-version       = "0.1.1"
+version       = "0.1.2"
 authors       = ["Danilo Guanabara <danguafer@gmail.com>"]
 edition       = "2018"
 license       = "Apache-2.0"
@@ -12,3 +12,5 @@ repository    = "https://github.com/notdanilo/cargo-web-component"
 
 [dependencies]
 toml = "0.5.7"
+actix-web = "3.1.0"
+actix-files = "0.4.0"
