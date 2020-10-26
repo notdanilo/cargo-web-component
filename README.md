@@ -21,7 +21,3 @@ cargo web-component serve
 ### Note
 
 This package was created to attend an urgent demand, so it is not in its best shape.
-
-### Requirements
-
-To serve the files
