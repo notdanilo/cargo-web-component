@@ -5,7 +5,7 @@ Cargo commands for `web-component-rs` development.
 
 To install:
 ```bash
-cargo install web-component
+cargo install cargo-web-component
 ```
 
 To build a project using `web-component-rs`:
