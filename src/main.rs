@@ -86,7 +86,12 @@ async fn main() -> std::io::Result<()> {
                 .run()
                 .await?;
         },
-        _ => ()
+        _ => {
+            println!("cargo web-component <command>");
+            println!("Where command is:");
+            println!("build - to build the project.");
+            println!("serve - to build and serve the project.");
+        }
     }
 
     Ok(())
