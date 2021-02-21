@@ -1,6 +1,5 @@
 use std::process;
 use std::fs::File;
-use std::fs::create_dir_all;
 use std::io::Write;
 use std::env;
 use toml::Value;
@@ -39,7 +38,6 @@ use actix_web::{App, HttpServer};
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let out_dir = "pkg";
-    create_dir_all(format!("./{}/web-component", out_dir)).expect("Couldn't create all directories.");
 
     match Command::from_args() {
         Command::Build => {
@@ -60,17 +58,11 @@ async fn main() -> std::io::Result<()> {
             let package_name = toml["package"]["name"].as_str().expect("Couldn't get package name.");
 
             let index_content = include_str!("../dependencies/index.html");
-            let index_content = index_content.replace("PACKAGE-NAME", package_name);
+            let index_content = index_content
+                .replace("PACKAGE-NAME", package_name)
+                .replace("WEB-COMPONENT-SOURCE", "https://notdanilo.github.io/web-component/web-component.js");
 
-            write_to(index_content.as_bytes()                                                          , &format!("./{}/index.html", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/vue.js")                            , &format!("./{}/web-component/vue.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component.js")                  , &format!("./{}/web-component/web-component.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-definition.js")       , &format!("./{}/web-component/web-component-definition.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-javascript.js")       , &format!("./{}/web-component/web-component-javascript.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-javascript-loader.js"), &format!("./{}/web-component/web-component-javascript-loader.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-loader.js")           , &format!("./{}/web-component/web-component-loader.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-wasm.js")             , &format!("./{}/web-component/web-component-wasm.js", out_dir));
-            write_to(include_bytes!("../dependencies/web-component/web-component-wasm-loader.js")      , &format!("./{}/web-component/web-component-wasm-loader.js", out_dir));
+            write_to(index_content.as_bytes(), &format!("./{}/index.html", out_dir));
         },
         Command::Serve(port) => {
             println!("Serving at localhost:{}", port);
