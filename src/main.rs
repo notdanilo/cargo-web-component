@@ -41,6 +41,12 @@ async fn main() -> std::io::Result<()> {
 
     match Command::from_args() {
         Command::Build => {
+            let contents = std::fs::read_to_string("./Cargo.toml")
+                .expect("Something went wrong reading the file");
+            let toml = contents.parse::<Value>().unwrap();
+
+            let package_name = toml["package"]["name"].as_str().expect("Couldn't get package name.");
+
             process::Command::new("wasm-pack")
                 .arg("build")
                 .arg("--target")
@@ -48,14 +54,10 @@ async fn main() -> std::io::Result<()> {
                 .arg("--no-typescript")
                 .arg("--out-dir")
                 .arg(out_dir)
+                .arg("--out-name")
+                .arg(package_name)
                 .status()
                 .expect("Failed");
-
-            let contents = std::fs::read_to_string("./Cargo.toml")
-                .expect("Something went wrong reading the file");
-            let toml = contents.parse::<Value>().unwrap();
-
-            let package_name = toml["package"]["name"].as_str().expect("Couldn't get package name.");
 
             let index_content = include_str!("../dependencies/index.html");
             let index_content = index_content
